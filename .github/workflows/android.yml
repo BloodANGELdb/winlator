@@ -24,27 +24,19 @@ jobs:
         distribution: 'temurin'
         cache: gradle
 
-    # 3. Проверка и создание Gradle Wrapper, если он отсутствует
-    - name: Ensure Gradle Wrapper exists
-      run: |
-        if [ ! -f "./gradlew" ]; then
-          echo "Gradle Wrapper не найден. Создаю Gradle Wrapper..."
-          gradle wrapper
-        fi
-
-    # 4. Установка прав для Gradle Wrapper
+    # 3. Установка прав для Gradle Wrapper
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
 
-    # 5. Сборка приложения
+    # 4. Сборка приложения
     - name: Build with Gradle
       run: ./gradlew assembleDebug
 
-    # 6. Получение короткого SHA хеша
+    # 5. Получение короткого SHA хеша
     - name: "Get Short SHA"
       run: echo "SHORT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
 
-    # 7. Создание релиза на GitHub
+    # 6. Создание релиза на GitHub
     - name: "Create Release"
       uses: softprops/action-gh-release@v2
       with:
