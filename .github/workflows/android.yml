@@ -6,31 +6,45 @@ on:
   pull_request:
     branches: [ "main" ]
 
-
 jobs:
   build:
 
     runs-on: ubuntu-latest
 
     steps:
+    # 1. Клонирование репозитория
     - name: Clone repository
       uses: actions/checkout@v4
-        
-    - name: set up JDK 17
+
+    # 2. Установка JDK 17
+    - name: Set up JDK 17
       uses: actions/setup-java@v4
       with:
         java-version: '17'
         distribution: 'temurin'
         cache: gradle
 
+    # 3. Проверка и создание Gradle Wrapper, если он отсутствует
+    - name: Ensure Gradle Wrapper exists
+      run: |
+        if [ ! -f "./gradlew" ]; then
+          echo "Gradle Wrapper не найден. Создаю Gradle Wrapper..."
+          gradle wrapper
+        fi
+
+    # 4. Установка прав для Gradle Wrapper
     - name: Grant execute permission for gradlew
       run: chmod +x gradlew
+
+    # 5. Сборка приложения
     - name: Build with Gradle
       run: ./gradlew assembleDebug
 
+    # 6. Получение короткого SHA хеша
     - name: "Get Short SHA"
       run: echo "SHORT_SHA=$(git rev-parse --short HEAD)" >> $GITHUB_ENV
-          
+
+    # 7. Создание релиза на GitHub
     - name: "Create Release"
       uses: softprops/action-gh-release@v2
       with:
